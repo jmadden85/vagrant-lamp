@@ -1,0 +1,102 @@
+
+---
+- hosts: all
+  user: vagrant
+  sudo: yes
+
+  vars_files:
+    - settings.yml
+
+  ###
+  # Clean up
+  ###
+  tasks:
+    - name: General | Update cache
+      apt: update-cache=yes
+
+    - name: General | Upgrade
+      apt: upgrade=yes
+
+  ###
+  # Installed required software
+  ###
+    - name: General | Install required packages.
+      action: apt pkg={{item}} state=installed
+      tags: common
+      with_items:
+        - build-essential
+        - libpcre3-dev
+        - curl
+        - apache2
+        - mysql-server
+        - mysql-client
+        - sqlite
+        - php5
+        - php5-curl
+        - php5-dev
+        - php5-mysqlnd
+        - php5-sqlite
+        - php5-xmlrpc
+        - php5-xdebug
+        - php-soap
+        - php-apc
+        - php5-gd
+        - sendmail
+        - unzip
+        - python-mysqldb
+
+    ###
+    # Config files
+    ###
+    ###
+    # PHP
+    ###
+    - name: PHP | Configuration file, php.ini
+      action: template src=templates/php-ini.j2 dest=/etc/php5/apache2/php.ini
+      tags: common
+    ###
+    # MySQL
+    ###
+    - name: MySQL | Configuration file, my.cnf
+      action: template src=templates/my-cnf.j2 dest=/etc/mysql/my.cnf
+      tags: common
+
+    - include: ./common-tasks/mysql-secure.yml
+    ###
+    # Apache
+    ###
+    - name: Apache | Enable some required modules
+      action: command a2enmod rewrite vhost_alias
+      tags: common
+      notify:
+        - Restart apache
+    ###
+    # Install latest node
+    ###
+    - name: Node.js | Package prerequisites for node.js
+      apt: pkg=python-software-properties state=installed
+      tags: nodejs
+
+    - name: Node.js | Add the node.js PPA
+      apt_repository: repo=ppa:chris-lea/node.js
+      tags: nodejs
+
+    - name: Node.js | Update the apt cache for the new repository
+      apt: update-cache=yes
+      tags: nodejs
+
+    - name: Node.js | Install nodejs
+      apt: pkg=nodejs state=installed
+      tags: nodejs
+
+    - name: Node.js | Install npm
+      shell: curl http://npmjs.org/install.sh | sudo sh creates=/usr/bin/npm
+      tags: nodejs
+
+
+
+  ###
+  # Include handlers
+  ###
+  handlers:
+    - include: handlers.yml
