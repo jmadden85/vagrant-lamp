@@ -44,6 +44,7 @@
         - sendmail
         - unzip
         - python-mysqldb
+        - python-passlib
 
     ###
     # Config files
@@ -92,6 +93,14 @@
     - name: Node.js | Install npm
       shell: curl http://npmjs.org/install.sh | sudo sh creates=/usr/bin/npm
       tags: nodejs
+
+    ###
+    # Set a password for .htaccess
+    ###
+    - name: HTPassword | Generate a htpassword for .htaccess
+      htpasswd: path=/etc/htpasswd/.htpasswd name=test password=test create=yes
+      tags: htpasswd
+
 
 
 
