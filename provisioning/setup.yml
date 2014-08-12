@@ -94,6 +94,10 @@
       shell: curl http://npmjs.org/install.sh | sudo sh creates=/usr/bin/npm
       tags: nodejs
 
+    - name: Admin | Change permissions on settings.php
+      shell: chmod a+w /var/www/proCert/settings.php
+      tags: chmod
+
     ###
     # Set a password for .htaccess
     ###
