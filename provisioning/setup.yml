@@ -95,7 +95,8 @@
       tags: nodejs
 
     - name: Admin | Change permissions on settings.php
-      shell: chmod a+w /var/www/proCert/settings.php
+      # shell: chmod a+w /var/www/proCert/settings.php
+      file: path=/var/www/proCert/settings.php mode=0777
       tags: chmod
 
     ###
